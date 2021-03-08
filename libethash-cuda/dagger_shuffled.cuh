@@ -5,9 +5,13 @@
 #include "cuda_helper.h"
 
 #define _PARALLEL_HASH 4
-
+#include <iostream>
+using namespace std;
 DEV_INLINE bool compute_hash(uint64_t nonce, uint2* mix_hash)
 {
+    clock_t start;
+    double duration;
+    start = clock();
     // sha3_512(header .. nonce)
     uint2 state[12];
 
@@ -95,12 +99,15 @@ DEV_INLINE bool compute_hash(uint64_t nonce, uint2* mix_hash)
 
     // keccak_256(keccak_512(header..nonce) .. mix);
     if (cuda_swab64(keccak_f1600_final(state)) > d_target)
+        duration=clock() - start ;
+        cout<<"ethash_search: "<< duration <<'\n';
         return true;
 
     mix_hash[0] = state[8];
     mix_hash[1] = state[9];
     mix_hash[2] = state[10];
     mix_hash[3] = state[11];
-
+    duration=clock() - start ;
+    cout<<"ethash_search: "<< duration <<'\n';
     return false;
 }
