@@ -57,5 +57,5 @@ DEV_INLINE bool compute_hash(uint64_t nonce, uint2* mix_hash)
     }
 
 
-    return false;
+    return true;
 }
