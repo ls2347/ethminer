@@ -26,6 +26,7 @@ DEV_INLINE bool compute_hash(uint64_t nonce, uint2* mix_hash)
         uint32_t init0[_PARALLEL_HASH];
 
         // share init among threads
+        //  27Gh/s
         for (int p = 0; p < _PARALLEL_HASH; p++)
         {
             uint2 shuffle[8];
@@ -51,7 +52,21 @@ DEV_INLINE bool compute_hash(uint64_t nonce, uint2* mix_hash)
             }
             init0[p] = SHFL(shuffle[0].x, 0, THREADS_PER_HASH);
         }
+        //
+        for (uint32_t a = 0; a < ACCESSES; a += 4)
+        {
+            int t = bfe(a, 2u, 3u);
 
+            for (uint32_t b = 0; b < 4; b++)
+            {
+                for (int p = 0; p < _PARALLEL_HASH; p++)
+                {
+                    offset[p] = fnv(init0[p] ^ (a + b), ((uint32_t*)&mix[p])[b]) % d_dag_size;
+                    offset[p] = SHFL(offset[p], t, THREADS_PER_HASH);
+                    mix[p] = fnv4(mix[p], d_dag[offset[p]].uint4s[thread_id]);
+                }
+            }
+        }
 
 
     }
