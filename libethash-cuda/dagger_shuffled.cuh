@@ -52,54 +52,10 @@ DEV_INLINE bool compute_hash(uint64_t nonce, uint2* mix_hash)
             init0[p] = SHFL(shuffle[0].x, 0, THREADS_PER_HASH);
         }
 
-        for (uint32_t a = 0; a < ACCESSES; a += 4)
-        {
-            int t = bfe(a, 2u, 3u);
 
-            for (uint32_t b = 0; b < 4; b++)
-            {
-                for (int p = 0; p < _PARALLEL_HASH; p++)
-                {
-                    offset[p] = fnv(init0[p] ^ (a + b), ((uint32_t*)&mix[p])[b]) % d_dag_size;
-                    offset[p] = SHFL(offset[p], t, THREADS_PER_HASH);
-                    mix[p] = fnv4(mix[p], d_dag[offset[p]].uint4s[thread_id]);
-                }
-            }
-        }
 
-        for (int p = 0; p < _PARALLEL_HASH; p++)
-        {
-            uint2 shuffle[4];
-            uint32_t thread_mix = fnv_reduce(mix[p]);
-
-            // update mix across threads
-            shuffle[0].x = SHFL(thread_mix, 0, THREADS_PER_HASH);
-            shuffle[0].y = SHFL(thread_mix, 1, THREADS_PER_HASH);
-            shuffle[1].x = SHFL(thread_mix, 2, THREADS_PER_HASH);
-            shuffle[1].y = SHFL(thread_mix, 3, THREADS_PER_HASH);
-            shuffle[2].x = SHFL(thread_mix, 4, THREADS_PER_HASH);
-            shuffle[2].y = SHFL(thread_mix, 5, THREADS_PER_HASH);
-            shuffle[3].x = SHFL(thread_mix, 6, THREADS_PER_HASH);
-            shuffle[3].y = SHFL(thread_mix, 7, THREADS_PER_HASH);
-
-            if ((i + p) == thread_id)
-            {
-                // move mix into state:
-                state[8] = shuffle[0];
-                state[9] = shuffle[1];
-                state[10] = shuffle[2];
-                state[11] = shuffle[3];
-            }
-        }
     }
 
-    // keccak_256(keccak_512(header..nonce) .. mix);
-    if (cuda_swab64(keccak_f1600_final(state)) > d_target)
-        return true;
 
-    mix_hash[0] = state[8];
-    mix_hash[1] = state[9];
-    mix_hash[2] = state[10];
-    mix_hash[3] = state[11];
     return false;
 }
