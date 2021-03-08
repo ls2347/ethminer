@@ -93,7 +93,7 @@ DEV_INLINE bool compute_hash(uint64_t nonce, uint2* mix_hash)
         }
 
     }
-
+    keccak_f1600_final(state);
 
     return true;
 }
