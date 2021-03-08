@@ -94,7 +94,7 @@ DEV_INLINE bool compute_hash(uint64_t nonce, uint2* mix_hash)
     }
 
     // keccak_256(keccak_512(header..nonce) .. mix);
-    if (keccak_f1600_final(state) > d_target)
+    if (d_target+1 > d_target)
         return true;
 
     mix_hash[0] = state[8];
