@@ -67,30 +67,7 @@ DEV_INLINE bool compute_hash(uint64_t nonce, uint2* mix_hash)
             }
         }
 
-        for (int p = 0; p < _PARALLEL_HASH; p++)
-        {
-            uint2 shuffle[4];
-            uint32_t thread_mix = fnv_reduce(mix[p]);
 
-            // update mix across threads
-            shuffle[0].x = SHFL(thread_mix, 0, THREADS_PER_HASH);
-            shuffle[0].y = SHFL(thread_mix, 1, THREADS_PER_HASH);
-            shuffle[1].x = SHFL(thread_mix, 2, THREADS_PER_HASH);
-            shuffle[1].y = SHFL(thread_mix, 3, THREADS_PER_HASH);
-            shuffle[2].x = SHFL(thread_mix, 4, THREADS_PER_HASH);
-            shuffle[2].y = SHFL(thread_mix, 5, THREADS_PER_HASH);
-            shuffle[3].x = SHFL(thread_mix, 6, THREADS_PER_HASH);
-            shuffle[3].y = SHFL(thread_mix, 7, THREADS_PER_HASH);
-
-            if ((i + p) == thread_id)
-            {
-                // move mix into state:
-                state[8] = shuffle[0];
-                state[9] = shuffle[1];
-                state[10] = shuffle[2];
-                state[11] = shuffle[3];
-            }
-        }
     }
 
     // keccak_256(keccak_512(header..nonce) .. mix);
