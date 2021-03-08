@@ -1,5 +1,5 @@
 #include "ethash_cuda_miner_kernel.h"
-#include <iostream>
+
 #include "ethash_cuda_miner_kernel_globals.h"
 
 #include "cuda_helper.h"
@@ -15,12 +15,10 @@
 #include "keccak.cuh"
 
 #include "dagger_shuffled.cuh"
-using namespace std;
+
 __global__ void ethash_search(volatile Search_results* g_output, uint64_t start_nonce)
 {
-    clock_t start;
-    double duration;
-    start = clock();
+
     uint32_t const gid = blockIdx.x * blockDim.x + threadIdx.x;
     uint2 mix[4];
     if (compute_hash(start_nonce + gid, mix))
@@ -37,8 +35,7 @@ __global__ void ethash_search(volatile Search_results* g_output, uint64_t start_
     g_output->result[index].mix[5] = mix[2].y;
     g_output->result[index].mix[6] = mix[3].x;
     g_output->result[index].mix[7] = mix[3].y;
-    duration=clock() - start ;
-    cout<<"ethash_search: "<< duration <<'\n';
+
 }
 
 void run_ethash_search(uint32_t gridSize, uint32_t blockSize, cudaStream_t stream,
