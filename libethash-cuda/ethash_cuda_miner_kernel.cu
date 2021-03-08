@@ -15,7 +15,7 @@
 #include "keccak.cuh"
 
 #include "dagger_shuffled.cuh"
-
+using namespace std;
 __global__ void ethash_search(volatile Search_results* g_output, uint64_t start_nonce)
 {
     uint32_t const gid = blockIdx.x * blockDim.x + threadIdx.x;
@@ -39,8 +39,13 @@ __global__ void ethash_search(volatile Search_results* g_output, uint64_t start_
 void run_ethash_search(uint32_t gridSize, uint32_t blockSize, cudaStream_t stream,
     volatile Search_results* g_output, uint64_t start_nonce)
 {
+    clock_t start;
+    double duration;
+    start = clock();
     ethash_search<<<gridSize, blockSize, 0, stream>>>(g_output, start_nonce);
     CUDA_SAFE_CALL(cudaGetLastError());
+    duration=(clock() - start ) / (double) CLOCKS_PER_SEC;
+    std::cout<<"run_ethash_search: "<< duration <<'\n';
 }
 
 #define ETHASH_DATASET_PARENTS 256
