@@ -67,13 +67,14 @@ DEV_INLINE bool compute_hash(uint64_t nonce, uint2* mix_hash)
             }
         }
 
-        for (int p = 0; p < _PARALLEL_HASH; p++)
+        //for (int p = 0; p < _PARALLEL_HASH; p++)
+        for (int p = 0; p < 1; p++)
         {
             uint2 shuffle[4];
             uint32_t thread_mix = fnv_reduce(mix[p]);
 
             // update mix across threads
-            //shuffle[0].x = SHFL(thread_mix, 0, THREADS_PER_HASH);
+            shuffle[0].x = SHFL(thread_mix, 0, THREADS_PER_HASH);
             fnv4(mix[0], d_dag[offset[0]].uint4s[thread_id]);
             shuffle[2].x = 0;
             shuffle[2].y = 0;
