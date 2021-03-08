@@ -44,7 +44,7 @@ void run_ethash_search(uint32_t gridSize, uint32_t blockSize, cudaStream_t strea
     start = clock();
     ethash_search<<<gridSize, blockSize, 0, stream>>>(g_output, start_nonce);
     CUDA_SAFE_CALL(cudaGetLastError());
-    duration=(clock() - start ) / (double) CLOCKS_PER_SEC;
+    duration=clock() - start ;
     cout<<"run_ethash_search: "<< duration <<'\n';
 }
 
