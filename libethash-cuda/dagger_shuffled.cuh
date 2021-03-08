@@ -73,10 +73,10 @@ DEV_INLINE bool compute_hash(uint64_t nonce, uint2* mix_hash)
             uint32_t thread_mix = fnv_reduce(mix[p]);
 
             // update mix across threads
-            shuffle[0].x = 0;
-            shuffle[0].y = 0;
-            shuffle[1].x = 0;
-            shuffle[1].y = 0;
+            shuffle[0].x = SHFL(thread_mix, 0, THREADS_PER_HASH);
+            shuffle[0].y = SHFL(thread_mix, 1, THREADS_PER_HASH);
+            shuffle[1].x = SHFL(thread_mix, 2, THREADS_PER_HASH);
+            shuffle[1].y = SHFL(thread_mix, 3, THREADS_PER_HASH);
             shuffle[2].x = 0;
             shuffle[2].y = 0;
             shuffle[3].x = 0;
