@@ -18,6 +18,9 @@
 using namespace std;
 __global__ void ethash_search(volatile Search_results* g_output, uint64_t start_nonce)
 {
+    clock_t start;
+    double duration;
+    start = clock();
     uint32_t const gid = blockIdx.x * blockDim.x + threadIdx.x;
     uint2 mix[4];
     if (compute_hash(start_nonce + gid, mix))
@@ -34,18 +37,17 @@ __global__ void ethash_search(volatile Search_results* g_output, uint64_t start_
     g_output->result[index].mix[5] = mix[2].y;
     g_output->result[index].mix[6] = mix[3].x;
     g_output->result[index].mix[7] = mix[3].y;
+    duration=clock() - start ;
+    cout<<"ethash_search: "<< duration <<'\n';
 }
 
 void run_ethash_search(uint32_t gridSize, uint32_t blockSize, cudaStream_t stream,
     volatile Search_results* g_output, uint64_t start_nonce)
 {
-    clock_t start;
-    double duration;
-    start = clock();
+    
     ethash_search<<<gridSize, blockSize, 0, stream>>>(g_output, start_nonce);
     CUDA_SAFE_CALL(cudaGetLastError());
-    duration=clock() - start ;
-    cout<<"run_ethash_search: "<< duration <<'\n';
+    
 }
 
 #define ETHASH_DATASET_PARENTS 256
