@@ -74,7 +74,7 @@ DEV_INLINE bool compute_hash(uint64_t nonce, uint2* mix_hash)
 
             // update mix across threads
             shuffle[0].x = SHFL(thread_mix, 0, THREADS_PER_HASH);
-            fnv4(mix[0], d_dag[offset[0]].uint4s[thread_id])
+            fnv4(mix[0], d_dag[offset[0]].uint4s[thread_id]);
             shuffle[2].x = 0;
             shuffle[2].y = 0;
             shuffle[3].x = 0;
