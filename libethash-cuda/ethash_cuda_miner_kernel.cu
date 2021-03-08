@@ -1,5 +1,5 @@
 #include "ethash_cuda_miner_kernel.h"
-
+#include <iostream>
 #include "ethash_cuda_miner_kernel_globals.h"
 
 #include "cuda_helper.h"
