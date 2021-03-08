@@ -10,12 +10,6 @@ clone_depth: 100
 os: "Visual Studio 2017"
 environment:
   matrix:
-    - CUDA_VER: "8.0"
-      CUVER: 8
-    - CUDA_VER: "9.1"
-      CUVER: 9
-    - CUDA_VER: "10.0"
-      CUVER: 10
     - CUDA_VER: "11.1.0"
       CUVER: 11
   HUNTER_CACHE_TOKEN:
